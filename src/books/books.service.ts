@@ -10,7 +10,7 @@ export class BooksService {
            title: 'The Great Gastby',
            author: 'F, Scott Fitzgerald',
            isbn: '9780743273565',
-           publishedYear: '1925',
+           publishedYear: 1925,
            IsAvailable: true,
         }
     ];
