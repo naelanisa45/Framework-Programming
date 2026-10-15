@@ -13,7 +13,6 @@ export class AuthService {
             username: registerDto.username,
             email: registerDto.email,
             password: registerDto.password,
-            confirmPassword: registerDto.confirmPassword
         };
         this.user.push(newUser);
         return newUser
@@ -24,7 +23,7 @@ export class AuthService {
         const user = this.user.find(
             user =>
                 user.username === loginDto.username &&
-            user.password === loginDto.password,
+                user.password === loginDto.password,
         );
 
         if (!user) {

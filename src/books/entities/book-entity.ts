@@ -3,6 +3,6 @@ export class Book{
     title: string;
     author: string;
     isbn: string;
-    publishedYear: string;
+    publishedYear: number;
     IsAvailable: boolean;
 }
