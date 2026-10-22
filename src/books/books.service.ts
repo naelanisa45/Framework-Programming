@@ -1,39 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { Book } from './entities/book-entity.js';
 import { CreateBookDto } from './dto/create-book.dto.js';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class BooksService {
-    private books: Book[] = [
-        {
-           id: 1,
-           title: 'The Great Gastby',
-           author: 'F, Scott Fitzgerald',
-           isbn: '9780743273565',
-           publishedYear: 1925,
-           IsAvailable: true,
-        }
-    ];
+    constructor(
+        @InjectRepository(Book)
+        private readonly bookRepository: Repository<Book>,
+    ){}
 
     //mencari semua data buku
-    findAll(): Book[] {
-        return this.books;
+     async findAll(): Promise<Book[]> {
+        return await this.bookRepository.find({
+            order:{ createdAt: 'DESC'},
+        })
     }
 
     //menyimpan data buku
-    create(book: CreateBookDto): Book{
-        const newBook: Book = {
-            id: this.books.length + 1,
-            title: book.title,
-            author: book.author,
-            isbn: book.isbn,
-            publishedYear: book.publishedYear,
-            IsAvailable: true
-        }
+    async create(book: CreateBookDto): Promise<Book> {
+        const newBook = this.bookRepository.create(book);
 
-        this.books.push(newBook);
-
-        return newBook;
+        return await this.bookRepository.save(newBook);
     }
 
 }
