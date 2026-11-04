@@ -1,11 +1,5 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Author } from '../../author/entities/author-entity.js';
 
 @Entity({ name: 'books' })
 export class Book {
@@ -16,9 +10,6 @@ export class Book {
   title: string;
 
   @Column({ type: 'varchar', length: 50 })
-  author: string;
-
-  @Column({ type: 'varchar', length: 50 })
   isbn: string;
 
   @Column({ type: 'int', default: 0 })
@@ -26,6 +17,10 @@ export class Book {
 
   @Column({ type: 'boolean', default: true })
   isAvailable: boolean;
+
+  @OneToOne(() => Author, {cascade:true})
+  @JoinColumn({name: 'author_id'})
+  author: Author
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

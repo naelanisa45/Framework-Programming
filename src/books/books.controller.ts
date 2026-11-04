@@ -1,46 +1,70 @@
-import { Controller, Get, Param, Post, Put, Patch, Delete, Body} from '@nestjs/common';
-import { BooksService } from './books.service.js';
+import { Injectable, NotFoundException } from '@nestjs/common';
+
+import { Book } from './entities/book-entity.js';
 import { CreateBookDto } from './dto/create-book.dto.js';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
-@Controller('books')
-export class BooksController {
-    constructor(private readonly booksService: BooksService) {
+@Injectable()
+export class BooksService {
+  constructor(
+    @InjectRepository(Book)
+    private readonly bookRepository: Repository<Book>,
+  ) {}
 
+  // Mencari semua data buku
+  async findAll(): Promise<Book[]> {
+    return this.bookRepository.find({
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  // Mencari buku berdasarkan ID
+  async findById(id: string): Promise<Book> {
+    const book = await this.bookRepository.findOne({
+      where: { id },
+    });
+
+    if (!book) {
+      throw new NotFoundException('Buku tidak ditemukan');
     }
 
-    //menampilkan semua data buku
-    @Get()
-    getBooks(){
-        return this.booksService.findAll();
-    }
+    return book;
+  }
 
-    //menambahkan data buku baru
-    @Post()
-    createBooks(@Body() createBookDto: CreateBookDto) {
-        return this.booksService.create(createBookDto);
-    }
+  // Menyimpan data buku
+  async create(body: any): Promise<Book> {
+  const author = new Book();
+  Object.assign(author, body);
 
-    //menampilkan data buku berdasarkan id
-    @Get(':id')
-    getBookById(@Param('id') id: string): string{
-        return `Data buku dengan id ${id} berhasil diperbarui`;
-    }
+  const savedAuthor = await this.bookRepository.save(author);
 
-    //update data buku secara keseluruhan
-    @Put(':id')
-    updateBook(@Param('id') id: string): string {
-        return `Data buku dengan id ${id} berhasil diperbarui`;
-    }
+  return savedAuthor;
+}
 
-    //update sebagian data buku
-    @Patch(':id')
-    patchBook(@Param('id') id: string): string {
-        return `Sebagian data buku denga id ${id} berhasil diperbarui`;
-    }
+  // Memperbarui data buku
+  async update(
+    id: string,
+    updateBook: CreateBookDto,
+  ): Promise<Book> {
+    const book = await this.findById(id);
 
-    //menghapus data buku
-    @Delete(':id')
-    deleteBook(@Param('id') id: string): string {
-        return `Data buku dengan id ${id} berhasil dihapus`;
-    }
+    Object.assign(book, updateBook);
+
+    return this.bookRepository.save(book);
+  }
+
+  // Menghapus data buku
+  async remove(
+    id: string,
+  ): Promise<{ message: string; deleteId: string }> {
+    await this.findById(id);
+
+    await this.bookRepository.softDelete(id);
+
+    return {
+      message: `Buku ${id} berhasil dihapus`,
+      deleteId: id,
+    };
+  }
 }

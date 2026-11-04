@@ -7,6 +7,8 @@ import { LogMiddlewareMiddleware } from './middleware/log-middleware/log-middlew
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModule } from './user/user.module.js';
+import { AuthorModule } from './author/author.module.js';
 
 @Module({
   imports: [
@@ -42,7 +44,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
         synchronize: configService.get<string>('NODE_ENV') === 'development',
       }),
-    })
+    }),
+
+    UserModule,
+
+    AuthorModule
   ],
   controllers: [AppController],
   providers: [AppService],
